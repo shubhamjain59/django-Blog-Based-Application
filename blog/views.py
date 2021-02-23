@@ -1,4 +1,5 @@
 from django.shortcuts import render, get_object_or_404
+from newsapi import NewsApiClient
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.models import User
 from django.views.generic import (
@@ -11,6 +12,9 @@ from django.views.generic import (
 from .models import Post
 
 def about(request):
+    newsauth = NewsApiClient(api_key="0a72a4892b0a46ac96a52f057a8a19a5")
+    topnews = newsauth.get_top_headlines(sources="techcrunch")
+    
     return render(request, 'blog/about.html')
 
 def home(request):
