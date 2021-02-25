@@ -12,10 +12,31 @@ from django.views.generic import (
 from .models import Post
 
 def about(request):
-    newsauth = NewsApiClient(api_key="0a72a4892b0a46ac96a52f057a8a19a5")
-    topnews = newsauth.get_top_headlines(sources="techcrunch")
-    
     return render(request, 'blog/about.html')
+
+def FetchArticles(request):
+    #author = User.objects.filter(username='sunny')
+    user = User.objects.first()
+    newsapi = NewsApiClient(api_key ='0a72a4892b0a46ac96a52f057a8a19a5') 
+    topnews = newsapi.get_top_headlines(q='bitcoin',
+                                        category='business',
+                                        language='en', 
+                                        country='in'
+    )
+    if topnews['status'] == 'ok':
+        if topnews['totalResults'] > 0:
+            articleList = topnews['articles']
+            for article in articleList:
+
+                articleTitle = article['title']
+                articleUrl = article['url']
+                articleContent = article['content']
+                add_article = Post.objects.create(title=articleTitle, 
+                                                content=articleContent, 
+                                                author=user)
+                add_article.save()
+
+    return render(request, 'blog/fetch-articles.html')
 
 def home(request):
     all_posts = Post.objects.all()
